@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrační stránka</title>
+</head>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f7fc;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+form {
+  margin-top: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input[type="text"], input[type="email"], input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.social-login {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.social-login a {
+  display: inline-block;
+  font-size: 20px;
+  padding: 10px;
+  background-color: #e7e7e7;
+  border-radius: 50%;
+  color: #555;
+  text-align: center;
+  text-decoration: none;
+}
+
+.social-login a:hover {
+  background-color: #ddd;
+}
+
+.social-login a.facebook {
+  background-color: #3b5998;
+  color: white;
+}
+
+.social-login a.instagram {
+  background-color: #e4405f;
+  color: white;
+}
+
+.social-login a.google {
+  background-color: #db4437;
+  color: white;
+}
+
+.social-login a.x {
+  background-color: #333;
+  color: white;
+}
+
+.error-messages {
+  color: red;
+  margin-bottom: 15px;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+</style>
+<script>
+function validateForm(event) {
+  event.preventDefault(); 
+
+  const username = document.getElementById('username').value;
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  let errors = [];
+
+  if (!/^[a-zA-Z0-9]+$/.test(username)) {
+      errors.push('Uživatelské jméno může obsahovat pouze alfanumerické znaky.');
+  }
+
+  const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  if (!emailPattern.test(email)) {
+      errors.push('Neplatný formát e-mailu.');
+  }
+
+  const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,16}$/;
+  if (!passwordPattern.test(password)) {
+      errors.push('Heslo musí mít minimálně 8 znaků a obsahovat malé písmeno, velké písmeno, číslo a speciální znak.');
+  }
+
+  const errorContainer = document.getElementById('errorMessages');
+  errorContainer.innerHTML = errors.map(error => `<li>${error}</li>`).join('');
+
+  if (errors.length === 0) {
+      sendFormData(username, email, password);
+  }
+}
+
+
+async function sendFormData(username, email, password) {
+  const response = await fetch('/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password })
+  });
+  const result = await response.json();
+
+  if (result.success) {
+      alert(result.message);
+      document.getElementById('registrationForm').reset(); // Reset formuláře
+  } else {
+      const errorContainer = document.getElementById('errorMessages');
+      errorContainer.innerHTML = result.errors.map(error => `<li>${error}</li>`).join('');
+  }
+}
+</script>
+<body>
+  <div class="container">
+    <h1>Registrační formulář</h1>
+    <form id="registrationForm" onsubmit="validateForm(event)">
+        <label for="username">Uživatelské jméno:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Heslo:</label>
+        <input type="password" id="password" name="password" required>
+
+        <ul id="errorMessages" class="error-messages"></ul>
+
+        <button type="submit">Registrovat</button>
+    </form>
+
+    <div class="social-login">
+        <a href="#" class="facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="google"><i class="fab fa-google"></i></a>
+        <a href="#" class="x"><i class="fas fa-times"></i></a>
+    </div>
+</div>
+</body>
+</html>
